@@ -23,12 +23,13 @@ use crate::QasmVersion;
 use crate::VariableGatherer;
 
 // Operations that are ignored by backend and do not throw an error
-pub(crate) const ALLOWED_OPERATIONS: &[&str; 12] = &[
+pub(crate) const ALLOWED_OPERATIONS: &[&str; 13] = &[
     "PragmaGetDensityMatrix",
     "PragmaGetOccupationProbability",
     "PragmaGetPauliProduct",
     "PragmaGetStateVector",
     "PragmaSleep",
+    "PragmaDamping",
     "PragmaSetNumberOfMeasurements",
     "PragmaStartDecompositionBlock",
     "PragmaStopDecompositionBlock",
@@ -39,7 +40,7 @@ pub(crate) const ALLOWED_OPERATIONS: &[&str; 12] = &[
 ];
 
 // Operations that are ignored when looking for a QASM definition
-pub(crate) const NO_DEFINITION_REQUIRED_OPERATIONS: &[&str; 15] = &[
+pub(crate) const NO_DEFINITION_REQUIRED_OPERATIONS: &[&str; 14] = &[
     "SingleQubitGate",
     "DefinitionFloat",
     "DefinitionUsize",
@@ -49,7 +50,6 @@ pub(crate) const NO_DEFINITION_REQUIRED_OPERATIONS: &[&str; 15] = &[
     "PragmaConditional",
     "PragmaGlobalPhase",
     "PragmaRepeatedMeasurement",
-    "PragmaDamping",
     "PragmaDephasing",
     "PragmaDepolarising",
     "MeasureQubit",
@@ -715,7 +715,13 @@ pub fn call_operation(
             )),
             _ => {
                 if ALLOWED_OPERATIONS.contains(&operation.hqslang()) {
-                    Ok("".to_string())
+                    Ok(format!(
+                        "pragmadamping({},{}) {}[{}];",
+                        op.gate_time(),
+                        op.rate(),
+                        qubit_register_name,
+                        op.qubit(),
+                    ))
                 } else {
                     Err(RoqoqoBackendError::OperationNotInBackend {
                         backend: "QASM",
@@ -1432,6 +1438,9 @@ pub fn gate_definition(
         },
         Operation::PragmaSleep(_) => Ok(String::from(
             "opaque pragmasleep(param) a;"
+        )),
+        Operation::PragmaDamping(_) => Ok(String::from(
+            "opaque pragmadamping(param1, param2) a;"
         )),
         Operation::GateDefinition(gate_definition) => {
             let mut definition_str = format!(
