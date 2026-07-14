@@ -10,6 +10,18 @@ This changelog track changes to the qoqo qasm project starting at version 0.5.0
 
 * Updated to qoqo 1.22, qoqo_calculator 1.9, ndarray 0.17.
 * Updated pyo3 dependency from 0.28 to 0.29.
+## 0.16
+
+### Updated in 0.16
+
+* Updated to qoqo 1.22, qoqo_calculator 1.9, ndarray 0.17.
+* Updated pyo3 dependency from 0.28 to 0.29.
+* 
+
+## 0.15.3
+
+### Updated in 0.15.3
+
 * Updated minimum supported Python version from 3.9 to 3.10.
 
 ## 0.15.2
